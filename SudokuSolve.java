@@ -7,7 +7,7 @@
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
-
+import java.lang.Exception;
 
 /**
  * The SudokuSolve class solves a sudoku puzzle given an initial board
@@ -44,7 +44,29 @@ public class SudokuSolve
         if (!good_file) printError("invalid input file " + input_file);
 
         // Build the board
-        GameBoard board = new GameBoard(input_file);
+        GameBoard board = null;
+        try
+        {
+            board = new GameBoard(input_file);
+        }
+        catch (Exception e)
+        {
+            printError(e.getMessage());
+        }
+
+        board.printState();
+        if (board.solve())
+        {
+            System.out.println("Solution found!");
+            board.printState();
+        }
+        else
+        {
+            System.out.println("No solution found.");
+            System.out.println("Try another board config.");
+        }
+        
+
     }
 
     public static void printUsage()

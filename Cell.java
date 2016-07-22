@@ -12,23 +12,16 @@
  */
 public class Cell
 {
-    private int num;            // board number [0,80] 
     private int value;          // sudoku value [1,9]
     private boolean is_empty;   // 0 -> empty cell
 
-    public Cell(int new_num, int new_val)
+    public Cell(int new_val)
     {
-        this.num = new_num
-        this.value = new_value;
+        this.value = new_val;
         this.is_empty = new_val == 0 ? true : false;
     }
 
-    public int getNum()
-    {
-        return this.num;
-    }
-
-    public int getVal()
+    public int getValue()
     {
         return this.value;
     }
@@ -38,9 +31,9 @@ public class Cell
         return this.is_empty;
     }
 
-    public void setVal(int new_num)
+    public void setVal(int new_val)
     {
         this.is_empty = new_val == 0 ? true : false;
-        this.num = new_num;
+        this.value = new_val;
     }
 }

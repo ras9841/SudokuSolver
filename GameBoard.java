@@ -6,6 +6,7 @@
 import java.nio.file.Path;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.lang.Integer;
 import java.lang.Exception;
 import java.util.Arrays;
 
@@ -19,22 +20,69 @@ import java.util.Arrays;
  */
 public class GameBoard
 {
-    public GameBoard(Path init)
+    private Cell[] board = new Cell[81];
+
+    public GameBoard(Path init) throws Exception 
     {
-        try (BufferedReader in = new BufferedReader(
-                                    new FileReader(init.toString())))
+        BufferedReader in = new BufferedReader(
+                                new FileReader(init.toString()));
+        String line;
+        String[] a_line;
+        int num = 0;
+        while ((line = in.readLine()) != null)
         {
-            String line;
-            String[] a_line;
-            while ((line = in.readLine()) != null)
+            a_line = line.split(",");
+            
+            if (a_line.length != 9) throw new Exception("invalid input."); 
+            
+            for (String s : a_line)
             {
-                a_line = line.split(",\\s+");
-                System.out.println(Arrays.toString(a_line));
+                int val = Integer.parseInt(s);
+                if (val < 0 || val > 9) throw new Exception("invalid number.");
+                
+                this.board[num] = new Cell(val);
+                num++;
             }
-        } 
-        catch (Exception e)
-        {
-            e.printStackTrace();
         }
-   }
+        in.close();
+    }
+
+    public void printState()
+    {
+    int num = 1;
+    for (Cell c : this.board)
+    {
+        String val = c.isEmpty() ? " " : Integer.toString(c.getValue()) ;
+
+        if (num % 9 == 0) 
+        {
+            System.out.print("\n");
+        }
+        else if ( num % 3 == 0 )
+        {
+            System.out.print(val+" | ");
+        }
+        else
+        {
+            System.out.print(val+" ");
+        }
+
+        if (num % 27 == 0) 
+        {
+            for (int i = 0; i<21; i++) System.out.print("-");
+            System.out.print("\n");
+        }
+
+        num++;
+    }
+
+    }
+
+    
+    public boolean solve()
+    {
+        return false;
+    }
+
+
 }
