@@ -40,7 +40,7 @@ public class GameBoard
                 int val = Integer.parseInt(s);
                 if (val < 0 || val > 9) throw new Exception("invalid number.");
                 
-                this.board[num] = new Cell(val);
+                this.board[num] = new Cell(val, num+1);
                 num++;
             }
         }
@@ -49,38 +49,74 @@ public class GameBoard
 
     public void printState()
     {
-    int num = 1;
-    for (Cell c : this.board)
+        int num = 1;
+        for (Cell c : this.board)
+        {
+            String val = c.isEmpty() ? " " : Integer.toString(c.getValue()) ;
+
+            if (num % 9 == 0) System.out.print(val+"\n");
+            else if ( num % 3 == 0 ) System.out.print(val+" | ");
+            else System.out.print(val+" ");
+
+            if (num % 27 == 0) 
+            {
+                for (int i = 0; i<21; i++) System.out.print("-");
+                System.out.print("\n");
+            }
+
+            num++;
+        }
+    }
+
+    public boolean isFull(Cell[] board)
     {
-        String val = c.isEmpty() ? " " : Integer.toString(c.getValue()) ;
-
-        if (num % 9 == 0) 
+        for (Cell c : board)
         {
-            System.out.print("\n");
+            if (c.isEmpty()) return false;
         }
-        else if ( num % 3 == 0 )
-        {
-            System.out.print(val+" | ");
-        }
-        else
-        {
-            System.out.print(val+" ");
-        }
-
-        if (num % 27 == 0) 
-        {
-            for (int i = 0; i<21; i++) System.out.print("-");
-            System.out.print("\n");
-        }
-
-        num++;
+        return true;
     }
 
+    public boolean isValid(Cell c, Cell[] b)
+    {
+        return checkRow(c,b) && checkCol(c,b) && checkGrid(c,b);
     }
 
+    public boolean checkRow(Cell c, Cell[] b)
+    {
+        return true;
+    }
+    
+    public boolean checkCol(Cell c, Cell[] b)
+    {
+        return true;
+    }
+    
+    public boolean checkGrid(Cell c, Cell[] b)
+    {
+        return true;
+    }
     
     public boolean solve()
     {
+        if (isFull(board)) return true;
+        
+        for (Cell c : board)
+        {
+            if (c.isEmpty())
+            {
+                for (int i = 1; i<10; i++)
+                {
+                    c.setValue(i);
+                    if (isValid(c, board))
+                    {
+                        if (solve()) return true;
+                    }
+                    c.setValue(0);
+                }
+            }
+        }
+
         return false;
     }
 
