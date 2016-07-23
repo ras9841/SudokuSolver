@@ -40,17 +40,18 @@ public class GameBoard
                 int val = Integer.parseInt(s);
                 if (val < 0 || val > 9) throw new Exception("invalid number.");
                 
-                this.board[num] = new Cell(val, num+1);
+                this.board[num] = new Cell(val, num);
                 num++;
             }
         }
         in.close();
+        if (num != 81) throw new Exception("not enough cells specified.");
     }
 
     public void printState()
     {
         int num = 1;
-        for (Cell c : this.board)
+        for (Cell c : board)
         {
             String val = c.isEmpty() ? " " : Integer.toString(c.getValue()) ;
 
@@ -68,55 +69,105 @@ public class GameBoard
         }
     }
 
-    public boolean isFull(Cell[] board)
-    {
-        for (Cell c : board)
-        {
-            if (c.isEmpty()) return false;
-        }
-        return true;
-    }
-
     public boolean isValid(Cell c, Cell[] b)
     {
         return checkRow(c,b) && checkCol(c,b) && checkGrid(c,b);
     }
 
+    public boolean noCopies(Cell[] vec)
+    {
+        int[] marker = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+        for (Cell cell : vec)
+        {
+            if (!cell.isEmpty())
+            {
+                marker[cell.getValue()-1]++;
+            }
+        }
+        for (int i : marker)
+        {
+            if (i>1) return false;
+        }
+        return true;
+
+    }
+
     public boolean checkRow(Cell c, Cell[] b)
     {
-        return true;
+        int row_num = c.getNum()/9;
+        Cell[] row = Arrays.copyOfRange(b, row_num*9, (row_num+1)*9);
+        return noCopies(row);
     }
     
     public boolean checkCol(Cell c, Cell[] b)
     {
-        return true;
+        int col_num = c.getNum()%9;
+        Cell[] col = new Cell[9];
+        for (int r = 0; r<9; r++)
+        {
+            col[r] = board[9*r+col_num];
+        }
+        return noCopies(col);
     }
     
     public boolean checkGrid(Cell c, Cell[] b)
     {
-        return true;
+        int grid_row = (c.getNum()/9)/3;
+        int grid_col = (c.getNum()%9)/3;
+
+        int nw_corner = 27*grid_row+grid_col*3;
+        int n  = 0, off;
+        Cell[] grid = new Cell[9];
+        
+        for (int i=0; i<3; i++)
+        {
+            for (int j=0; j<3; j++)
+            {
+                off = 9*i+j;
+                grid[n] = board[nw_corner+off];
+                n++;
+            }
+        }
+        
+        return noCopies(grid);
     }
     
-    public boolean solve()
+    public Cell nextEmpty()
     {
-        if (isFull(board)) return true;
-        
         for (Cell c : board)
         {
             if (c.isEmpty())
             {
-                for (int i = 1; i<10; i++)
-                {
-                    c.setValue(i);
-                    if (isValid(c, board))
-                    {
-                        if (solve()) return true;
-                    }
-                    c.setValue(0);
-                }
+                return c;
             }
         }
+        return null;
+    }
 
+    public boolean solve(boolean debug)
+    {
+        Cell c = nextEmpty();
+        if (c == null) return true;
+
+        if (c.isEmpty())
+        {
+            for (int i = 1; i<10; i++)
+            {
+                c.setValue(i);
+                if (isValid(c, board))
+                {
+                    if (debug)
+                    {
+                        System.out.print("\n");
+                        printState();
+                        System.out.print("\n");
+                    }
+                    if (solve(debug)) return true;
+                }
+                c.setValue(0);
+            }
+        }
+        
         return false;
     }
 

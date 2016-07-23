@@ -55,7 +55,7 @@ public class SudokuSolve
         }
 
         board.printState();
-        if (board.solve())
+        if (board.solve(false))
         {
             System.out.println("Solution found!");
             board.printState();

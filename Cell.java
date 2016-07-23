@@ -12,7 +12,7 @@
  */
 public class Cell
 {
-    private int num;            // Board number [1,81]
+    private int num;            // Board number [0,80]
     private int value;          // sudoku value [1,9]
     private boolean is_empty;   // 0 -> empty cell
 
