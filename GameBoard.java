@@ -23,6 +23,11 @@ public class GameBoard
     private Cell[] board = new Cell[81];
 
     public GameBoard(Path init) throws Exception 
+    /**
+     * Constructs an instance of the GameBoard class given an input file.
+     *
+     * @param init system path to initial game state.
+     */
     {
         BufferedReader in = new BufferedReader(
                                 new FileReader(init.toString()));
@@ -49,6 +54,10 @@ public class GameBoard
     }
 
     public void printState()
+    /**
+     * Prints the game board to standard output. Note that the top-left corner
+     * when printed corresponds to first index in the board.
+     */
     {
         int num = 1;
         for (Cell c : board)
@@ -69,12 +78,25 @@ public class GameBoard
         }
     }
 
-    public boolean isValid(Cell c, Cell[] b)
+    public boolean isValid(Cell c)
+    /**
+     * Does the given cell break any Sudoku rules?
+     *
+     * @param c the cell in question
+     * @return true if valid, false if not
+     */
     {
-        return checkRow(c,b) && checkCol(c,b) && checkGrid(c,b);
+        return checkRow(c) && checkCol(c) && checkGrid(c);
     }
 
     public boolean noCopies(Cell[] vec)
+    /**
+     * Helper function for the isValid() checks that determines if there are
+     * multiple instances of a number in a vector.
+     *
+     * @param vec array of cells to check
+     * @return true if no copies, false if copies exist
+     */
     {
         int[] marker = {0, 0, 0, 0, 0, 0, 0, 0, 0};
         for (Cell cell : vec)
@@ -92,14 +114,26 @@ public class GameBoard
 
     }
 
-    public boolean checkRow(Cell c, Cell[] b)
+    public boolean checkRow(Cell c)
+    /**
+     * Is the row associated with the given cell valid?
+     *
+     * @param c the cell in question
+     * @return true if valid, false if not
+     */
     {
         int row_num = c.getNum()/9;
-        Cell[] row = Arrays.copyOfRange(b, row_num*9, (row_num+1)*9);
+        Cell[] row = Arrays.copyOfRange(board, row_num*9, (row_num+1)*9);
         return noCopies(row);
     }
     
-    public boolean checkCol(Cell c, Cell[] b)
+    public boolean checkCol(Cell c)
+    /**
+     * Is the column associated with the given cell valid?
+     *
+     * @param c the cell in question
+     * @return true if valid, false if not
+     */
     {
         int col_num = c.getNum()%9;
         Cell[] col = new Cell[9];
@@ -110,29 +144,40 @@ public class GameBoard
         return noCopies(col);
     }
     
-    public boolean checkGrid(Cell c, Cell[] b)
+    public boolean checkGrid(Cell c)
+    /**
+     * Is the 3x3 grid associated with the given cell valid?
+     *
+     * @param c the cell in question
+     * @return true if valid, false if not
+     */
     {
         int grid_row = (c.getNum()/9)/3;
         int grid_col = (c.getNum()%9)/3;
 
+        // Index of the top-left grid corner
         int nw_corner = 27*grid_row+grid_col*3;
+        
         int n  = 0, off;
         Cell[] grid = new Cell[9];
-        
-        for (int i=0; i<3; i++)
+        for (int i=0; i<3; i++) //rows
         {
-            for (int j=0; j<3; j++)
+            for (int j=0; j<3; j++) //cols
             {
                 off = 9*i+j;
                 grid[n] = board[nw_corner+off];
                 n++;
             }
         }
-        
         return noCopies(grid);
     }
     
     public Cell nextEmpty()
+    /**
+     * Finds the next empty cell on the board.
+     *
+     * @return empty cell, null if all spots on board are full
+     */
     {
         for (Cell c : board)
         {
@@ -145,6 +190,12 @@ public class GameBoard
     }
 
     public boolean solve(boolean debug)
+    /**
+     * Main solution method for the Sudoku puzzle using backtracking.
+     *
+     * @param debug if true, the board state will be printed each iteration.
+     * @return is the board solved?
+     */
     {
         Cell c = nextEmpty();
         if (c == null) return true;
@@ -154,7 +205,7 @@ public class GameBoard
             for (int i = 1; i<10; i++)
             {
                 c.setValue(i);
-                if (isValid(c, board))
+                if (isValid(c))
                 {
                     if (debug)
                     {
@@ -164,7 +215,7 @@ public class GameBoard
                     }
                     if (solve(debug)) return true;
                 }
-                c.setValue(0);
+                c.setValue(0); // backtrack
             }
         }
         
